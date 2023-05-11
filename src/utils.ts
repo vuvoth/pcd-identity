@@ -1,28 +1,32 @@
+import axios from "axios";
 import { SnarkJSProof, Proof } from "./types";
 
+import path from "path";
+import fs from "fs";
 
 export function extractSignatureFromPDF() {}
 
 export function splitToWordsWithName(
-  x: bigint,
-  w: bigint,
-  n: bigint,
+  value: bigint,
+  wordSize: bigint,
+  wordCount: bigint,
   name: string
 ) {
-  let t = x;
+  let t = value;
   const words: { [key: string]: string } = {};
-  for (let i = BigInt(0); i < n; ++i) {
+  for (let i = BigInt(0); i < wordCount; ++i) {
     const baseTwo: bigint = 2n;
     const key = `${name}[${i.toString()}]`;
-    words[key] = `${t % baseTwo ** w}`;
-    t = BigInt(t / 2n ** w);
+    words[key] = `${t % baseTwo ** wordSize}`;
+    t = BigInt(t / 2n ** wordSize);
   }
   if (!(t == BigInt(0))) {
-    throw `Number ${x} does not fit in ${(w * n).toString()} bits`;
+    throw `Number ${value} does not fit in ${(
+      wordSize * wordCount
+    ).toString()} bits`;
   }
   return words;
 }
-
 
 /**
  * Packs a proof into a format compatible with Semaphore.
@@ -60,3 +64,25 @@ export function unpackProof(proof: Proof): SnarkJSProof {
   };
 }
 
+function getFileName(urlFile: string): string {
+  return urlFile.split("/").pop() as string;
+}
+
+export async function downloadFile(url: string): Promise<boolean> {
+  const META_PATH = __dirname + "/meta";
+  let fileName = getFileName(url);
+  console.log(path.join(META_PATH, fileName));
+  if (fs.existsSync(path.join(META_PATH, fileName))) return false;
+
+  const writer = fs.createWriteStream(path.join(META_PATH, fileName));
+
+  const res = await axios({
+    url,
+    method: "GET",
+    responseType: "stream",
+  });
+
+  res.data.pipe(writer);
+  return true;  
+  
+}

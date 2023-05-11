@@ -4,8 +4,8 @@ import { expect } from "chai";
 
 describe("Utils tests", () => {
     it("splitToWordsWithName succesfully", () => {
-        let number = BigInt("255");
-        let result = splitToWordsWithName(number, 1n, 8n, "bin");
+        let value = BigInt("255");
+        let result = splitToWordsWithName(value, 1n, 8n, "bin");
         let expected = {
             'bin[0]': '1',
             'bin[1]': '1',

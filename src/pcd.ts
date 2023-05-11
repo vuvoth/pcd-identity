@@ -17,20 +17,19 @@ import {
 
 import { v4 as uuidv4 } from "uuid";
 //@ts-ignore
-import { groth16 } from "snarkjs";
-//@ts-ignore
 import snarkjs from "snarkjs";
 
-import { splitToWordsWithName, unpackProof } from "./utils";
+import { downloadFile, splitToWordsWithName } from "./utils";
 import axios from "axios";
 import { IdentityPCDCardBody } from "./CardBody";
 
-const PUBLIC_ZKEY_PROVE_URL =
+export const PUBLIC_ZKEY_PROVE_URL =
   "https://d2ovde7k6pdj39.cloudfront.net/groth16_zkey_prove.json";
-const PUBLIC_ZKEY_VERIFY_URL =
+export const PUBLIC_ZKEY_VERIFY_URL =
   "https://d2ovde7k6pdj39.cloudfront.net/groth16_zkey_verify.json";
-const PUBLIC_CIRCUIT_URL =
+export const PUBLIC_CIRCUIT_URL =
   "https://d2ovde7k6pdj39.cloudfront.net/rsa_sha1_verify.json";
+
 export class IdentityPCD implements PCD<IdentityPCDClaim, IdentityPCDProof> {
   type = IdentityPCDTypeName;
   claim: IdentityPCDClaim;
@@ -52,7 +51,11 @@ export class IdentityPCD implements PCD<IdentityPCDClaim, IdentityPCDProof> {
 let initArgs: PCDInitArgs | undefined = undefined;
 export async function init(args: PCDInitArgs): Promise<void> {
   initArgs = args;
+  await downloadFile(initArgs.verificationKeyFilePath);
+  await downloadFile(initArgs.wasmFilePath);
+  await downloadFile(initArgs.zkeyFilePath);
 }
+
 
 async function zkProof(pcdArgs: IdentityPCDArgs): Promise<IdentityPCDProof> {
   const input = Object.assign(
@@ -83,10 +86,11 @@ async function zkProof(pcdArgs: IdentityPCDArgs): Promise<IdentityPCDProof> {
       await axios.get(PUBLIC_CIRCUIT_URL)
     ).data
   );
-  const provingKey = await (await axios.get(PUBLIC_ZKEY_PROVE_URL)).data;
-  const wtns = circuit.calculateWitness(input);
-  const { proof, publicSignals } = snarkjs.groth.genProof(
-    snarkjs.unstringifyBigInts(provingKey),
+  // const provingKey = await (await axios.get(PUBLIC_ZKEY_PROVE_URL)).data;
+  // const wtns = circuit.calculateWitness(input);
+  const { proof, publicSignals } = snarkjs.groth16.groth16FullProve(
+    input, 
+    
     snarkjs.unstringifyBigInts(wtns)
   );
 
