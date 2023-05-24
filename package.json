@@ -2,7 +2,7 @@
   "name": "pcd-country-identity",
   "version": "1.0.0",
   "main": "index.js",
-  "repository": "https://github.com/vuvoth/pcd-country-identity",
+  "repository": "https://github.com/vuvoth/pcd-identity",
   "author": "Vu Vo <vu.voth@gmail.com>",
   "license": "MIT",
   "scripts": {
