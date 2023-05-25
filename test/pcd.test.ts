@@ -7,12 +7,12 @@ import { genData } from './utils'
 describe('PCD tests', function () {
   this.timeout(0)
   it('PCD flow', async () => {
+    const dirName = __dirname + '/../artifacts';
+    console.log(dirName);
     const pcdInitArgs: PCDInitArgs = {
-      circuitURL: 'https://d2ovde7k6pdj39.cloudfront.net/rsa_sha1_verify.json',
-      zkeyProveFilePath:
-        'https://d2ovde7k6pdj39.cloudfront.net/groth16_zkey_prove.json',
-      zkeyVerifyKeyFilePath:
-        'https://d2ovde7k6pdj39.cloudfront.net/groth16_zkey_verify.json',
+      verifyKeyURL: dirName + '/verification_key.json',
+      wasmURL: dirName + '/rsa_verify_sha1_pkcs1v15.wasm',
+      zkeyURL: dirName + '/circuit_final.zkey'
     }
 
     await init(pcdInitArgs)
