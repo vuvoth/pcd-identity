@@ -2,6 +2,20 @@
 
 git submodule update --init --recursive
 
+cd build 
+
+git clone https://github.com/iden3/circom.git
+
+cd circom 
+cargo build --release
+cargo install --path circom
+
+cd ..
+
+wget https://hermez.s3-eu-west-1.amazonaws.com/powersOfTau28_hez_final_20.ptau
+
+cd ..
+
 cd circom-rsa-verify 
 yarn
 
@@ -11,20 +25,21 @@ cd ..
 
 cd test 
 
-wget https://hermez.s3-eu-west-1.amazonaws.com/powersOfTau28_hez_final_20.ptau
+circom circuits/rsa_verify_sha1_pkcs1v15.circom  --r1cs --wasm -o ../../build
 
-circom circuits/rsa_verify_sha1_pkcs1v15.circom  --r1cs --wasm
+pwd
 
+ls  ../../build
 
-npx snarkjs groth16 setup rsa_verify_sha1_pkcs1v15.r1cs powersOfTau28_hez_final_20.ptau circuit_0000.zkey
+npx snarkjs groth16 setup ../../build/rsa_verify_sha1_pkcs1v15.r1cs ../../build/powersOfTau28_hez_final_20.ptau ../../build/circuit_0000.zkey
 
-echo "test random" |npx snarkjs zkey contribute circuit_0000.zkey circuit_final.zkey 
+echo "test random" | npx snarkjs zkey contribute ../../build/circuit_0000.zkey ../../build/circuit_final.zkey 
 
-npx snarkjs zkey export verificationkey circuit_final.zkey verification_key.json
+npx snarkjs zkey export verificationkey ../../build/circuit_final.zkey ../../build/verification_key.json
 
-cd ..
+cd ../../
 
-cp test/rsa_verify_sha1_pkcs1v15_js/rsa_verify_sha1_pkcs1v15.wasm ../artifacts
-cp test/circuit_final.zkey ../artifacts
-cp test/verification_key.json ../artifacts
+cp build/rsa_verify_sha1_pkcs1v15_js/rsa_verify_sha1_pkcs1v15.wasm ./artifacts
+cp build/circuit_final.zkey ./artifacts
+cp build/verification_key.json ./artifacts
 
