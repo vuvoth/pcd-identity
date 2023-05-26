@@ -58,15 +58,13 @@ async function zkProof(pcdArgs: IdentityPCDArgs): Promise<IdentityPCDProof> {
     modulus: splitToWordsWithName(BigInt(pcdArgs.mod), BigInt(32), BigInt(64)),
     hashed: splitToWordsWithName(pcdArgs.message as bigint, 32n, 5n),
   }
-  console.log(input)
-  console.log(groth16.fullProve)
+
   const { proof } = await groth16.fullProve(
     input,
     initArgs?.wasmURL,
     initArgs?.zkeyURL
   )
 
-  console.log([proof])
   return {
     exp: pcdArgs.exp,
     mod: pcdArgs.mod,
@@ -91,14 +89,20 @@ export async function prove(args: IdentityPCDArgs): Promise<IdentityPCD> {
   return new IdentityPCD(id, pcdClaim, pcdProof)
 }
 
+function getVerifyKey() {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const verifyKey = require('../artifacts/verification_key.json')
+  return verifyKey
+}
 export async function verify(pcd: IdentityPCD): Promise<boolean> {
+  const vk = getVerifyKey()
   return snarkjs.groth16.verify(
-    initArgs?.verifyKeyURL,
+    vk,
     [
       ...splitToWordsWithName(BigInt(65337), BigInt(32), BigInt(64)),
       ...splitToWordsWithName(BigInt(pcd.proof.mod), BigInt(32), BigInt(64)),
     ],
-    pcd.proof
+    pcd.proof.proof
   )
 }
 

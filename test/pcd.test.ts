@@ -10,7 +10,6 @@ describe('PCD tests', function () {
     const dirName = __dirname + '/../artifacts';
     console.log(dirName);
     const pcdInitArgs: PCDInitArgs = {
-      verifyKeyURL: dirName + '/verification_key.json',
       wasmURL: dirName + '/rsa_verify_sha1_pkcs1v15.wasm',
       zkeyURL: dirName + '/circuit_final.zkey'
     }
