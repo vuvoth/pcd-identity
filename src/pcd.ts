@@ -15,9 +15,7 @@ import { groth16 } from 'snarkjs'
 import * as snarkjs from 'snarkjs'
 
 import { splitToWordsWithName } from './utils'
-import axios from 'axios'
 import { IdentityPCDCardBody } from './CardBody'
-import { isWebUri } from 'valid-url'
 export class IdentityPCD implements PCD<IdentityPCDClaim, IdentityPCDProof> {
   type = IdentityPCDTypeName
   claim: IdentityPCDClaim
@@ -41,15 +39,7 @@ export async function init(args: PCDInitArgs): Promise<void> {
   initArgs = args
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-async function fetchKey(keyURL: string): Promise<string | ArrayBuffer> {
-  if (isWebUri(keyURL)) {
-    const keyData = await (await axios.get(keyURL)).data
-    const keyBin = Buffer.from(keyData)
-    return keyBin
-  }
-  return keyURL
-}
+
 
 async function zkProof(pcdArgs: IdentityPCDArgs): Promise<IdentityPCDProof> {
   const input = {
