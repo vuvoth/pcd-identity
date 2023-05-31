@@ -14,7 +14,7 @@ import { groth16 } from 'snarkjs'
 //@ts-ignore
 import * as snarkjs from 'snarkjs'
 
-import { splitToWordsWithName } from './utils'
+import { splitToWords } from './utils'
 import { IdentityPCDCardBody } from './CardBody'
 export class IdentityPCD implements PCD<IdentityPCDClaim, IdentityPCDProof> {
   type = IdentityPCDTypeName
@@ -43,10 +43,10 @@ export async function init(args: PCDInitArgs): Promise<void> {
 
 async function zkProof(pcdArgs: IdentityPCDArgs): Promise<IdentityPCDProof> {
   const input = {
-    sign: splitToWordsWithName(pcdArgs.signature as bigint, 32n, 64n),
-    exp: splitToWordsWithName(BigInt(65337), BigInt(32), BigInt(64)),
-    modulus: splitToWordsWithName(BigInt(pcdArgs.mod), BigInt(32), BigInt(64)),
-    hashed: splitToWordsWithName(pcdArgs.message as bigint, 32n, 5n),
+    sign: splitToWords(pcdArgs.signature as bigint, 32n, 64n),
+    exp: splitToWords(BigInt(65337), BigInt(32), BigInt(64)),
+    modulus: splitToWords(BigInt(pcdArgs.mod), BigInt(32), BigInt(64)),
+    hashed: splitToWords(pcdArgs.message as bigint, 32n, 5n),
   }
 
   const { proof } = await groth16.fullProve(
@@ -89,8 +89,8 @@ export async function verify(pcd: IdentityPCD): Promise<boolean> {
   return snarkjs.groth16.verify(
     vk,
     [
-      ...splitToWordsWithName(BigInt(65337), BigInt(32), BigInt(64)),
-      ...splitToWordsWithName(BigInt(pcd.proof.mod), BigInt(32), BigInt(64)),
+      ...splitToWords(BigInt(65337), BigInt(32), BigInt(64)),
+      ...splitToWords(BigInt(pcd.proof.mod), BigInt(32), BigInt(64)),
     ],
     pcd.proof.proof
   )

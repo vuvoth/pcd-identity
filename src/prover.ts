@@ -1,10 +1,10 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { isWebUri } from 'valid-url'
 import { IdentityPCDArgs, IdentityPCDProof } from './types'
 import axios from 'axios'
-import { splitToWordsWithName } from './utils'
+import { splitToWords } from './utils'
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-//@ts-ignore
+// @ts-ignore
 import { groth16 } from 'snarkjs'
 
 type Witness = IdentityPCDArgs
@@ -56,14 +56,14 @@ export class BackendProver implements ProverInferace {
 
   async proving(witness: Witness): Promise<IdentityPCDProof> {
     const input = {
-      sign: splitToWordsWithName(witness.signature as bigint, 32n, 64n),
-      exp: splitToWordsWithName(BigInt(65337), BigInt(32), BigInt(64)),
-      modulus: splitToWordsWithName(
+      sign: splitToWords(witness.signature as bigint, 32n, 64n),
+      exp: splitToWords(BigInt(65337), BigInt(32), BigInt(64)),
+      modulus: splitToWords(
         BigInt(witness.mod),
         BigInt(32),
         BigInt(64)
       ),
-      hashed: splitToWordsWithName(witness.message as bigint, 32n, 5n),
+      hashed: splitToWords(witness.message as bigint, 32n, 5n),
     }
 
     const { proof } = await groth16.fullProve(
@@ -94,14 +94,14 @@ export class WebProver implements ProverInferace {
     const zkeyBuffer = (await this.zkey.getKey()) as ArrayBuffer
 
     const input = {
-      sign: splitToWordsWithName(witness.signature as bigint, 32n, 64n),
-      exp: splitToWordsWithName(BigInt(65337), BigInt(32), BigInt(64)),
-      modulus: splitToWordsWithName(
+      sign: splitToWords(witness.signature as bigint, 32n, 64n),
+      exp: splitToWords(BigInt(65337), BigInt(32), BigInt(64)),
+      modulus: splitToWords(
         BigInt(witness.mod),
         BigInt(32),
         BigInt(64)
       ),
-      hashed: splitToWordsWithName(witness.message as bigint, 32n, 5n),
+      hashed: splitToWords(witness.message as bigint, 32n, 5n),
     }
 
     const { proof } = await groth16.fullProve(
