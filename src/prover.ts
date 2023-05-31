@@ -56,20 +56,20 @@ export class BackendProver implements ProverInferace {
 
   async proving(witness: Witness): Promise<IdentityPCDProof> {
     const input = {
-      sign: splitToWords(witness.signature as bigint, 32n, 64n),
-      exp: splitToWords(BigInt(65337), BigInt(32), BigInt(64)),
+      sign: splitToWords(witness.signature as bigint, 64n, 32n),
+      exp: splitToWords(BigInt(65337), 64n, 32n),
       modulus: splitToWords(
         BigInt(witness.mod),
-        BigInt(32),
-        BigInt(64)
+        64n,
+        32n
       ),
-      hashed: splitToWords(witness.message as bigint, 32n, 5n),
+      hashed: splitToWords(witness.message as bigint, 64n, 3n),
     }
 
     const { proof } = await groth16.fullProve(
       input,
-      this.wasm.getKey(),
-      this.zkey.getKey()
+      await this.wasm.getKey(),
+      await this.zkey.getKey()
     )
 
     return {
@@ -94,14 +94,14 @@ export class WebProver implements ProverInferace {
     const zkeyBuffer = (await this.zkey.getKey()) as ArrayBuffer
 
     const input = {
-      sign: splitToWords(witness.signature as bigint, 32n, 64n),
-      exp: splitToWords(BigInt(65337), BigInt(32), BigInt(64)),
+      sign: splitToWords(witness.signature as bigint, 64n, 32n),
+      exp: splitToWords(BigInt(65337), 64n, 32n),
       modulus: splitToWords(
         BigInt(witness.mod),
-        BigInt(32),
-        BigInt(64)
+        64n,
+        32n
       ),
-      hashed: splitToWords(witness.message as bigint, 32n, 5n),
+      hashed: splitToWords(witness.message as bigint, 64n, 3n),
     }
 
     const { proof } = await groth16.fullProve(

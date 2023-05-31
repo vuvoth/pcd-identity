@@ -11,7 +11,8 @@ describe('PCD tests', function () {
     console.log(dirName);
     const pcdInitArgs: PCDInitArgs = {
       wasmURL: dirName + '/rsa_verify_sha1_pkcs1v15.wasm',
-      zkeyURL: dirName + '/circuit_final.zkey'
+      zkeyURL: dirName + '/circuit_final.zkey',
+      isWebEnv: false
     }
 
     await init(pcdInitArgs)
