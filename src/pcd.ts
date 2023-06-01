@@ -9,8 +9,9 @@ import {
 } from './types'
 
 import { v4 as uuidv4 } from 'uuid'
-//@ts-ignore
-import * as snarkjs from 'snarkjs'
+
+// @ts-ignore
+import { groth16 } from 'snarkjs'
 
 import { splitToWords } from './utils'
 import { IdentityPCDCardBody } from './CardBody'
@@ -38,29 +39,6 @@ export async function init(args: PCDInitArgs): Promise<void> {
   initArgs = args
 }
 
-
-
-// async function zkProof(pcdArgs: IdentityPCDArgs): Promise<IdentityPCDProof> {
-//   const input = {
-//     sign: splitToWords(pcdArgs.signature as bigint, 32n, 64n),
-//     exp: splitToWords(BigInt(65337), BigInt(32), BigInt(64)),
-//     modulus: splitToWords(BigInt(pcdArgs.mod), BigInt(32), BigInt(64)),
-//     hashed: splitToWords(pcdArgs.message as bigint, 32n, 5n),
-//   }
-
-//   const { proof } = await groth16.fullProve(
-//     input,
-//     initArgs?.wasmURL,
-//     initArgs?.zkeyURL
-//   )
-
-//   return {
-//     exp: pcdArgs.exp,
-//     mod: pcdArgs.mod,
-//     proof,
-//   }
-// }
-
 export async function prove(args: IdentityPCDArgs): Promise<IdentityPCD> {
   if (!initArgs) {
     throw new Error(
@@ -69,19 +47,21 @@ export async function prove(args: IdentityPCDArgs): Promise<IdentityPCD> {
   }
 
   const id = uuidv4()
+
   const pcdClaim: IdentityPCDClaim = {
     exp: args.exp,
     mod: args.mod,
   }
-  let prover: ProverInferace;
 
-  if(initArgs.isWebEnv) {
-    prover = new WebProver(initArgs.wasmURL, initArgs.zkeyURL);
+  let prover: ProverInferace
+
+  if (initArgs.isWebEnv) {
+    prover = new WebProver(initArgs.wasmURL, initArgs.zkeyURL)
   } else {
-    prover = new BackendProver(initArgs.wasmURL, initArgs.zkeyURL);
+    prover = new BackendProver(initArgs.wasmURL, initArgs.zkeyURL)
   }
 
-  const pcdProof = await prover.proving(args);
+  const pcdProof = await prover.proving(args)
 
   return new IdentityPCD(id, pcdClaim, pcdProof)
 }
@@ -91,9 +71,10 @@ function getVerifyKey() {
   const verifyKey = require('../artifacts/verification_key.json')
   return verifyKey
 }
+
 export async function verify(pcd: IdentityPCD): Promise<boolean> {
   const vk = getVerifyKey()
-  return snarkjs.groth16.verify(
+  return groth16.verify(
     vk,
     [
       ...splitToWords(BigInt(65337), 64n, 32n),
